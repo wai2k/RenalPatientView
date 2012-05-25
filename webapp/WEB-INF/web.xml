@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+
+    <!--Stuff for JForum-->
+    <!-- Clickstream -->
+
+    <filter>
+        <filter-name>clickstream-jforum</filter-name>
+        <filter-class>com.worthsoln.forum.RpvForumFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>clickstream-jforum</filter-name>
+        <url-pattern>*.page</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>net.jforum.ForumSessionListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>jforum</servlet-name>
+        <servlet-class>net.jforum.JForum</servlet-class>
+
+        <init-param>
+            <param-name>development</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>jforum</servlet-name>
+        <url-pattern>*.page</url-pattern>
+    </servlet-mapping>
+
+  <servlet>
+    <servlet-name>action</servlet-name>
+    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>/WEB-INF/struts-config.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>xmlParser</servlet-name>
+    <servlet-class>com.worthsoln.patientview.ParserMonitorServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>index.do</welcome-file>
+  </welcome-file-list>
+  <error-page>
+    <error-code>400</error-code>
+    <location>/patient_details.do</location>
+  </error-page>
+  <taglib>
+    <taglib-uri>
+      /tags/struts-bean
+    </taglib-uri>
+    <taglib-location>
+      /WEB-INF/struts/struts-bean.tld
+    </taglib-location>
+  </taglib>
+  <taglib>
+    <taglib-uri>
+      /tags/struts-html
+    </taglib-uri>
+    <taglib-location>
+      /WEB-INF/struts/struts-html.tld
+    </taglib-location>
+  </taglib>
+  <taglib>
+    <taglib-uri>
+      /tags/struts-logic
+    </taglib-uri>
+    <taglib-location>
+      /WEB-INF/struts/struts-logic.tld
+    </taglib-location>
+  </taglib>
+  <taglib>
+    <taglib-uri>
+      /tags/struts-nested
+    </taglib-uri>
+    <taglib-location>
+      /WEB-INF/struts/struts-nested.tld
+    </taglib-location>
+  </taglib>
+  <taglib>
+    <taglib-uri>
+      /tags/struts-tiles
+    </taglib-uri>
+    <taglib-location>
+      /WEB-INF/struts/struts-tiles.tld
+    </taglib-location>
+  </taglib>
+  <taglib>
+    <taglib-uri>
+      /tags/struts-tiles
+    </taglib-uri>
+    <taglib-location>
+      /WEB-INF/struts/struts-tiles.tld
+    </taglib-location>
+  </taglib>
+  <taglib>
+    <taglib-uri>
+      /tags/datetime
+    </taglib-uri>
+    <taglib-location>
+      /WEB-INF/struts/datetime.tld
+    </taglib-location>
+  </taglib>
+  <security-constraint>
+    <display-name>Control</display-name>
+    <web-resource-collection>
+      <web-resource-name>Protected Area</web-resource-name>
+      <url-pattern>/control/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>superadmin</role-name>
+      <role-name>unitadmin</role-name>
+      <role-name>unitstaff</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <security-constraint>
+    <display-name>Patient</display-name>
+    <web-resource-collection>
+      <web-resource-name>Protected Area</web-resource-name>
+      <url-pattern>/logged_in.do</url-pattern>
+      <url-pattern>/patient/index.do</url-pattern>
+      <url-pattern>/patient/aboutme.do</url-pattern>
+      <url-pattern>/patient/aboutme_display.jsp</url-pattern>
+      <url-pattern>/patient/aboutme_edit.jsp</url-pattern>
+      <url-pattern>/patient/aboutme_image_upload.jsp</url-pattern>
+      <url-pattern>/patient/contact.do</url-pattern>
+      <url-pattern>/patient/contact.jsp</url-pattern>
+      <url-pattern>/patient/diagnosis_links.jsp</url-pattern>
+      <url-pattern>/patient/letters.do</url-pattern>
+      <url-pattern>/patient/letters.jsp</url-pattern>
+      <url-pattern>/patient/letterDetail.do</url-pattern>
+      <url-pattern>/patient/letter_denied.jsp</url-pattern>
+      <url-pattern>/patient/letter_detail.jsp</url-pattern>
+      <url-pattern>/patient/medical_view.do</url-pattern>
+      <url-pattern>/patient/medical_view.jsp</url-pattern>
+      <url-pattern>/patient/medicines.do</url-pattern>
+      <url-pattern>/patient/medicines.jsp</url-pattern>
+      <url-pattern>/patient/password_change.jsp</url-pattern>
+      <url-pattern>/patient/password_change_confirm.jsp</url-pattern>
+      <url-pattern>/patient/patient_comment_denied.jsp</url-pattern>
+      <url-pattern>/patient/patient_comment_confirm.jsp</url-pattern>
+      <url-pattern>/patient/patient_details.do</url-pattern>
+      <url-pattern>/patient/patient_details.jsp</url-pattern>
+      <url-pattern>/patient/patient_entry.do</url-pattern>
+      <url-pattern>/patient/patient_entry.jsp</url-pattern>
+      <url-pattern>/patient/patient_entry_bp.jsp</url-pattern>
+      <url-pattern>/patient/patient_entry_glucose.jsp</url-pattern>
+      <url-pattern>/patient/patient_entry_result_comment.jsp</url-pattern>
+      <url-pattern>/patient/patient_entry_weight.jsp</url-pattern>
+      <url-pattern>/patient/patient_view.do</url-pattern>
+      <url-pattern>/patient/patient_view.jsp</url-pattern>
+      <url-pattern>/patient/results.do</url-pattern>
+      <url-pattern>/patient/results.jsp</url-pattern>
+      <url-pattern>/patient/patientAddsBloodPressure.do</url-pattern>
+      <url-pattern>/patient/patientSubmitsBloodPressures.do</url-pattern>
+      <url-pattern>/patient/patientDeletesBloodPressure.do</url-pattern>
+      <url-pattern>/patient/patientAddsGlucose.do</url-pattern>
+
+            <!--For forums-->
+            <url-pattern>/forums/*</url-pattern>
+            <url-pattern>/posts/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>demo</role-name>
+      <role-name>patient</role-name>
+      <role-name>superadmin</role-name>
+      <role-name>unitadmin</role-name>
+      <role-name>unitstaff</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+      <form-login-page>/login.do</form-login-page>
+      <form-error-page>/login-error.do</form-error-page>
+    </form-login-config>
+  </login-config>
+  <security-role>
+    <role-name>superadmin</role-name>
+  </security-role>
+  <security-role>
+    <role-name>unitadmin</role-name>
+  </security-role>
+  <security-role>
+    <role-name>unitstaff</role-name>
+  </security-role>
+  <security-role>
+    <role-name>patient</role-name>
+  </security-role>
+</web-app>

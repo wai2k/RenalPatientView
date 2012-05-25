@@ -1,0 +1,188 @@
+<project name="patientview" default="build" basedir=".">
+
+    <property name="src" value="src"/>
+    <property name="java" value="${src}/java"/>
+    <property name="test" value="${src}/test"/>
+    <property name="unit" value="${test}/unit"/>
+    <property name="system" value="${test}/system"/>
+    <property name="mock" value="${test}/mock"/>
+
+    <property name="classes" value="classes"/>
+    <property name="lib" value="lib"/>
+    <property name="lib_jforum" value="lib/jforum"/>
+    <property name="build" value="build"/>
+    <property name="package" value="${build}/package"/>
+
+    <property name="webapp" value="webapp"/>
+    <property name="metainf" value="${webapp}/META-INF"/>
+    <property name="webinf" value="${webapp}/WEB-INF"/>
+    <property name="webinf_struts" value="${webinf}/struts"/>
+    <property name="webinf_lib" value="${webinf}/lib"/>
+    <property name="webinf_classes" value="${webinf}/classes"/>
+
+    <property name="jarfile" value="${build}/${ant.project.name}.jar"/>
+    <property name="tomcatjarfile" value="${build}/${ant.project.name}-tomcat.jar"/>
+    <property name="warfile" value="${build}/${ant.project.name}.war"/>
+    <property name="project_zip" value="${build}/${ant.project.name}.zip"/>
+
+    <property name="sql.increment" value="${src}/sql/mysql/${ant.project.name}-increment.sql"/>
+
+    <property name="doc" value="doc"/>
+    <property name="reports" value="reports"/>
+
+    <target name="production_properties">
+      <property file="production.properties" />
+    </target>
+
+    <target name="properties">
+      <property file="build.properties" />
+      <property file="default.properties"/>
+    </target>
+
+    <target name="prepare">
+        <delete dir="${build}" failonerror="false"/>
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="compile">
+        <delete dir="${classes}"/>
+        <mkdir dir="${classes}"/>
+
+        <javac destdir="${classes}" debug="on">
+            <src path="${java}"/>
+            <src path="${unit}"/>
+            <src path="${system}"/>
+            <src path="${mock}"/>
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <!--Also need the Tomcat jars to compile against-->
+                <fileset dir="${tomcat.root}/common/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <fileset dir="${tomcat.root}/server/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="unittest">
+        <delete dir="${reports}"/>
+        <mkdir dir="${reports}"/>
+
+        <junit printsummary="yes" haltonerror="yes" haltonfailure="yes">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement location="${classes}"/>
+                <pathelement location="${webapp}"/>
+                <pathelement location="${webinf}"/>
+                <pathelement location="${webinf_struts}"/>
+            </classpath>
+
+            <formatter type="xml"/>
+
+            <batchtest fork="yes" todir="${reports}">
+                <fileset dir="${classes}">
+                    <include name="**/*Test.class"/>
+                    <exclude name="**/*SystemTest.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="systemtest">
+        <junit printsummary="yes" haltonerror="yes" haltonfailure="yes">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar"/>
+                </fileset>
+                <pathelement location="${classes}"/>
+            </classpath>
+
+            <formatter type="xml"/>
+
+            <batchtest fork="yes" todir="${reports}">
+                <fileset dir="${classes}">
+                    <include name="**/*SystemTest.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="jar" description="jar up classes">
+        <jar destfile="${jarfile}" basedir="${classes}"/>
+    </target>
+
+    <target name="jarTomcatLib" description="jar up tomcat classes">
+        <jar destfile="${tomcatjarfile}" basedir="${classes}">
+            <include name="**/LockOutRealm.class"/>
+        </jar>
+    </target>
+
+    <target name="delete_context">
+        <delete file="${metainf}/context.xml"/>
+    </target>
+
+    <target name="copy_context" unless="dont.copy.context">
+        <copy file="${src}/conf/${build.location}/context.xml" tofile="${metainf}/context.xml"/>
+    </target>
+
+    <target name="config">
+        <copy file="${src}/conf/${build.location}/log4j.xml" tofile="${webinf}/log4j.xml" overwrite="true"/>
+        <copy file="${src}/conf/${build.location}/mysql.properties" tofile="${webinf}/config/database/mysql/mysql.properties"  overwrite="true"/>
+        <copy file="${src}/conf/${build.location}/SystemGlobals.properties" tofile="${webinf}/config/SystemGlobals.properties"  overwrite="true"/>
+    </target>
+
+    <target name="war">
+        <copy todir="${webinf_classes}">
+            <fileset dir="${src}/hibernate" includes="**/*.xml"/>
+        </copy>
+        <war basedir="${webapp}" destfile="${warfile}"
+             webxml="${webinf}/web.xml">
+            <lib dir="${build}">
+                <include name="**/*.jar"/>
+            </lib>
+            <lib dir="${lib}">
+                <include name="*.jar"/>
+            </lib>
+            <lib dir="${lib_jforum}">
+                <include name="*.jar"/>
+            </lib>
+        </war>
+    </target>
+
+    <target name="build" depends="properties, prepare, compile, jar, jarTomcatLib, delete_context, copy_context, config, war" description="builds app and runs tests">
+        <echo message="build of ${ant.project.name} complete"/>
+    </target>
+
+    <target name="package" depends="prepare">
+       <mkdir dir="${package}"/>
+       <copy file="${warfile}" tofile="${package}/${ant.project.name}-webapp.war"/>
+       <copy file="${sql.increment}" todir="${package}"/>
+    </target>
+
+    <target name="build-production" depends="production_properties, build, package" description="builds production">
+        <echo message="production build of ${ant.project.name} complete"/>
+    </target>
+
+    <property name="common" value="../common"/>
+    <!-- Tomcat Deployment stuff -->
+    <target name="deploy_dev" description="Install web application">
+        <ant antfile="${common}/build/build_deploy.xml" target="deploy_dev" dir="${common}">
+            <property name="projectname" value="${ant.project.name}"/>
+            <property name="projectbasedir" value="${basedir}"/>
+        </ant>
+    </target>
+
+    <target name="undeploy_dev" description="Install web application">
+        <ant antfile="${common}/build/build_deploy.xml" target="undeploy_dev" dir="${common}">
+            <property name="projectname" value="${ant.project.name}"/>
+            <property name="projectbasedir" value="${basedir}"/>
+        </ant>
+    </target>
+
+</project>

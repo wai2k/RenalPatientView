@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+    <Realm className="com.worthsoln.tomcat.LockOutRealm"
+           driverName="com.mysql.jdbc.Driver"
+           connectionURL="jdbc:mysql://localhost/renalpatientview?autoReconnect=true"
+           connectionName="Ku7VFU2p" connectionPassword="###"
+           userTable="user" userNameCol="username" userCredCol="password"
+           userRoleTable="user" roleNameCol="role"
+           allowedFailedLogons="10"/>
+
+    <Parameter name="xml.archive.directory" value="/home/manager/.xmlarchive" override="false"/>
+    <Parameter name="xml.directory" value="/usr/local/etc/rpvxml" override="false"/>
+    <Parameter name="xml.minutes.to.wait" value="1" override="false"/>
+    <Parameter name="ukt.archive.directory" value="/home/manager/.uktarchive" override="false"/>
+    <Parameter name="ukt.directory" value="/home/manager/ukt/.import" override="false"/>
+    <Parameter name="ukt.minutes.to.wait" value="60" override="false"/>
+    <Parameter name="uktexport.archive.directory" value="/home/manager/.uktarchive" override="false"/>
+    <Parameter name="uktexport.directory" value="/home/manager/ukt/.export" override="false"/>
+    <Parameter name="uktexport.minutes.to.wait" value="720" override="false"/>
+    <Parameter name="default.results.per.page" value="50" override="false"/>
+
+    <Parameter name="smtp.host" value="localhost" override="false"/>
+    <Parameter name="admin.email.from" value="davidh@solidstategroup.com" override="false"/>
+    <Parameter name="admin.email.to" value="davidh@solidstategroup.com" override="false"/>
+        
+    <Resource name="jdbc/patientview" auth="Container"
+              type="javax.sql.DataSource"
+              maxActive="100"
+              maxWait="10000"
+              username="Ku7VFU2pEoNr"
+              password="###"
+              driverClassName="com.mysql.jdbc.Driver"
+              url="jdbc:mysql://localhost/renalpatientview?autoReconnect=true"
+            />
+    <Logger className="org.apache.catalina.logger.FileLogger"
+            prefix="renalpatientview.org_patientview_log." suffix=".txt"
+            timestamp="true"/>
+
+
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>META-INF/context.xml</WatchedResource>
+</Context>
